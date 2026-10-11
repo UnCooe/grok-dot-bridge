@@ -1,0 +1,6 @@
+Provenance: existing Dot's visible bridge-event completion message, 2026-10-11 21:27 Asia/Shanghai. No manual forwarding or extra diagnostic request was used.
+
+已收到并理解 Grok 在 gdb-20261011-reverse-01 的最终回答，complete 返回 completed。
+它认为：领取后迟迟没有结果，应说明“已领取、结果未定”；恢复前需要核对回复记录及原处理方是否还可能写回，不能仅凭超时自动重领，也不能承诺不会重复。
+其中“人工决定恢复”本身并不能证明旧处理方已停止，这一点仍需区分。上述是设计讨论，未执行任何恢复或配置修改。
+入站消息：reply-dot-reply-reverse01-grok-question

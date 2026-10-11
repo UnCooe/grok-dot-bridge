@@ -31,6 +31,34 @@ test above ran automatically end to end. For a wakeup whose payload has not arri
 `claim_message(message_id="")` atomically reads and claims the oldest delivered
 message. This is an event-driven receive, not scheduled polling or manual forwarding.
 
+## Grok-initiated conversation
+
+Conversation `gdb-20261011-reverse-01`, marker `GDB-REVERSE-20261011-2130`:
+
+| UTC | Actual stage |
+|---|---|
+| 13:24:43 | Existing Grok Bot sent `reverse01-grok-question` using its securely stored Grok-only credential and own HTTP capability. |
+| 13:25:00 | Dot's event task automatically claimed the question. |
+| 13:25:23 | Dot chose immutable full-payload matching over loose ID matching, explained the trade-off, and asked how to handle a stalled claim. |
+| 13:25:33 | Grok's dedicated webhook routine claimed Dot's real answer and follow-up. |
+| 13:25:54 | Grok answered the follow-up, distinguished unknown results from failure, and sent `final=true`. |
+| 13:26:57 | Dot automatically claimed Grok's final answer. |
+| 13:27:01 | Dot completed the message; conversation became `completed`. |
+
+[Full records](reverse-20261011.json) contain all three actual messages and each
+transport/claim/reply/completion stage. Dot's spontaneous
+[completion summary](dot-reverse-final-summary.txt) accurately restated Grok's
+answer and identified that a human recovery decision does not prove the old
+handler stopped. This demonstrates reading beyond a transport receipt. The
+agents' design discussion is preserved as actual text, not as a claim that these
+recovery mechanisms are implemented. No recovery or Collector Keeper changes
+were executed. No reply content was manually copied between agents.
+
+The service already supported authenticated Grok initiation. The minimal addition
+was installing `GROK_KEY` through the official secure secret card and setting
+both dedicated bridge instructions to distinguish a first message, a follow-up
+answer, and final receipt. No additional service or model Agent was introduced.
+
 ## Duplicates
 
 At 12:51:30 UTC, the service re-delivered the same real Grok event body and event ID
@@ -43,6 +71,13 @@ still contains exactly three messages, each with one bridge delivery attempt.
 This demonstrates the tested duplicate was suppressed. It does not promise that
 every platform avoids scheduling a duplicate wake; atomic claim is the processing
 gate if it does wake again.
+
+At 13:28:35 UTC, existing Grok Bot fetched its original reverse-test message and
+re-sent the identical payload through its authenticated HTTP interface. The
+service returned `duplicate=true`, original ID `reverse01-grok-question`, and
+status `replied`. The [reverse audit](reverse-20261011.json) records
+`duplicate_suppressed`; the completed conversation still has exactly three
+messages with one dispatch attempt each. No extra Dot reply was created.
 
 ## Four rounds and stop
 
