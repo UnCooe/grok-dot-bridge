@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+data/
+private/
+__pycache__/
+*.pyc
+*.sqlite*
+*.pem
+*.key
+acceptance/private/
